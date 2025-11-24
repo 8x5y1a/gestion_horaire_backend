@@ -1,5 +1,5 @@
 
-# Schedule Manager (Gestion Horaire) Frontend 
+# Schedule Manager (Gestion Horaire) Backend 
 
 
 ## 🔍 Overview
