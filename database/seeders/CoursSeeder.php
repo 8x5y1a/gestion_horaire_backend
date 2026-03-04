@@ -47,6 +47,9 @@ class CoursSeeder extends Seeder
             ['id'=>31,'nom'=>'Réseaux d\'objets connectés', 'code'=>'420-5P2-HU', 'ponderation'=>'1-3-1', 'bloc'=>'2-2', 'local_technique'=>false, 'cours_charge'=>false,'session' => 5, 'created_at'=> now(),'updated_at'=>now()],
             ['id'=>32,'nom'=>'Serveurs Linux Internet', 'code'=>'420-5S1-HU', 'ponderation'=>'2-2-2', 'bloc'=>'2-2', 'local_technique'=>false, 'cours_charge'=>false,'session' => 5, 'created_at'=> now(),'updated_at'=>now()],
             ['id'=>33,'nom'=>'Cybersécurité', 'code'=>'420-5T0-HU', 'ponderation'=>'3-4-2', 'bloc'=>'3-2-2', 'local_technique'=>false, 'cours_charge'=>false,'session' => 5, 'created_at'=> now(),'updated_at'=>now()],
+            ['id'=>34,'nom'=>'Environnement informatique', 'code'=>'420-105-HU', 'ponderation'=>'3-4-2', 'bloc'=>'3', 'local_technique'=>false, 'cours_charge'=>false,'session' => 5, 'created_at'=> now(),'updated_at'=>now()],
+            ['id'=>35,'nom'=>'Introduction aux bases de données', 'code'=>'420-T51-HU', 'ponderation'=>'3-4-2', 'bloc'=>'3-2', 'local_technique'=>false, 'cours_charge'=>false,'session' => 5, 'created_at'=> now(),'updated_at'=>now()],
+            ['id'=>36,'nom'=>'Logiciel d\'administration', 'code'=>'420-131-HU', 'ponderation'=>'3-4-2', 'bloc'=>'3-2-2', 'local_technique'=>false, 'cours_charge'=>false,'session' => 1, 'created_at'=> now(),'updated_at'=>now()],
         ]);
 
         DB::table('cheminement_cours')->insert([
@@ -83,6 +86,9 @@ class CoursSeeder extends Seeder
             ['cheminement_id'=>2, 'cours_id'=>31],
             ['cheminement_id'=>2, 'cours_id'=>32],
             ['cheminement_id'=>2, 'cours_id'=>33],
+            ['cheminement_id'=>2, 'cours_id'=>34],['cheminement_id'=>1, 'cours_id'=>34],
+            ['cheminement_id'=>2, 'cours_id'=>35],['cheminement_id'=>1, 'cours_id'=>35],
+            ['cheminement_id'=>2, 'cours_id'=>36],['cheminement_id'=>1, 'cours_id'=>36],
         ]);
     }
 }

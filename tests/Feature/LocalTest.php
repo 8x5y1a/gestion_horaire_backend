@@ -1,9 +1,12 @@
 <?php
 
+//AUTHOR: Jean-François Gamache
+
 namespace Tests\Feature;
 
 use App\Models\Local;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Laravel\Sanctum\Sanctum;
@@ -21,8 +24,9 @@ class LocalTest extends TestCase
     {
         parent::setUp();
 
-
         $user = User::factory()->create();
+        $role = Role::find(1);
+        $user->role()->attach($role);
         Sanctum::actingAs($user);
     }
 

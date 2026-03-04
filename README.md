@@ -73,4 +73,3 @@ Start the server
 This project was made in Autumn 2023
 
 [Frontend Repository](https://github.com/8x5y1a/gestion_horaire_frontend)
-

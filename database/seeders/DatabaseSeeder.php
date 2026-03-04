@@ -9,7 +9,7 @@ use App\Models\BlocHeure;
 use App\Models\BlocLibre;
 use App\Models\Cheminement;
 use App\Models\Contrainte;
-use App\Models\Personnel;
+use App\Models\TypeContrainte;
 use App\Models\User;
 use App\Models\Local;
 use App\Models\Cours;
@@ -24,36 +24,23 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        //Créer un utilisateur test pour chaque rôle
-        \App\Models\User::factory()->create([
-            'name'=>'Enseignant',
-            'email'=>'enseignant@test.com',
-            'password' => bcrypt("Enseignant1")
-        ]);
-        \App\Models\User::factory()->create([
-            'name'=>'Administrateur',
-            'email'=>'admin@gmail.com',
-            'password' => bcrypt("password")
-        ]);
-        \App\Models\User::factory()->create([
-            'name'=>'Coordonnateur',
-            'email'=>'coordonnateur@test.com',
-            'password' => bcrypt("Coordonnateur1")
-        ]);
+
         //Appeler les Seeders
         $this->call([
             /* @author Fabrice & Louis */
-            PersonnelSeeder::class,
+            JourSeeder::class,
+            RoleSeeder::class,
+            UserSeeder::class,
             CheminementSeeder::class,
             CoursSeeder::class,
+            TypeContrainteSeeder::class,
             ContrainteSeeder::class,
             BlocHeureSeeder::class,
             BlocLibreSeeder::class,
+            BlocGenerauxSeeder::class,
             LocalSeeder::class,
             CampusSeeder::class,
         ]);
-        //Créer des données avec les Factories
-        User::factory(5)->create();
         $this->call([
             GroupeCourSeeder::class,
             BlocCourSeeder::class,

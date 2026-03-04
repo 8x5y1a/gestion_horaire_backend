@@ -17,11 +17,11 @@ class HoraireFactory extends Factory
     public function definition(): array
     {
         return [
-            "lundi" => "0000000000",
-            "mardi" => "0000000000",
-            "mercredi" => "0000000000",
-            "jeudi" => "0000000000",
-            "vendredi" => "0000000000",
+            "Lundi" => "0000000000",
+            "Mardi" => "0000000000",
+            "Mercredi" => "0000000000",
+            "Jeudi" => "0000000000",
+            "Vendredi" => "0000000000",
             'created_at' => now(),
             'updated_at' => now(),
         ];

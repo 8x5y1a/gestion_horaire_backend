@@ -1,9 +1,12 @@
 <?php
 
+//AUTHOR: Louis-Carl Proulx
+
 namespace Tests\Feature;
 
 use App\Models\Campus;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -22,6 +25,8 @@ class CampusTest extends TestCase
 
         $this->seed(\Database\Seeders\CampusSeeder::class);
         $user = User::factory()->create();
+        $role = Role::find(1);
+        $user->role()->attach($role);
         Sanctum::actingAs($user);
     }
 

@@ -1,11 +1,13 @@
 <?php
 
+//AUTHOR: Mathieu Lahaie-Richer
 
 use App\Models\Cheminement;
 use App\Models\Contrainte;
 use App\Models\Cours;
 use App\Models\Horaire;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -23,6 +25,8 @@ class CheminementTest extends TestCase
 
         parent::setUp();
         $user = User::factory()->create();
+        $role = Role::find(1);
+        $user->role()->attach($role);
         Sanctum::actingAs($user);
     }
 
@@ -36,22 +40,17 @@ class CheminementTest extends TestCase
 
         $cours1 = Cours::factory()->createOne();
         $cours2 = Cours::factory()->createOne();
-        $contrainte1 = Contrainte::factory()->createOne();
-        $contrainte2 = Contrainte::factory()->createOne();
         $horaire = Horaire::factory()->createOne();
 
         $cheminement = [
             'option' => "Programmation",
-            'nom' => "Technique de l'informatique",
-            'horaire_id' => $horaire->id,
+            'nom' => "Technique de l'informatique"
         ];
 
         $requete = [
             'option' => "Programmation",
             'nom' => "Technique de l'informatique",
-            'horaire_id' => $horaire->id,
             'cours' => [$cours1->id,$cours2->id],
-            'contraintes' => [$contrainte1->id,$contrainte2->id]
         ];
 
         $this->assertDatabaseMissing('cheminements',$cheminement);
@@ -105,12 +104,10 @@ class CheminementTest extends TestCase
         $this->assertDatabaseMissing('cheminements',['id' => $cheminement->id]);
     }
 
-    public function test_modification_cours_valid(){
+    public function test_modification_cheminement_valid(){
 
         $cours1 = Cours::factory()->createOne();
         $cours2 = Cours::factory()->createOne();
-        $contrainte1 = Contrainte::factory()->createOne();
-        $contrainte2 = Contrainte::factory()->createOne();
         $horaire = Horaire::factory()->createOne();
 
         $cheminement = Cheminement::factory()->createOne();
@@ -118,9 +115,7 @@ class CheminementTest extends TestCase
         $requete = [
             'option' => "Programmation",
             'nom' => "Technique informatique",
-            'horaire_id' => $horaire->id,
             'cours' => [$cours1->id,$cours2->id],
-            'contraintes' => [$contrainte1->id,$contrainte2->id]
         ];
 
         $response = $this->putJson('/api/cheminement/'. $cheminement->id,$requete);
@@ -131,15 +126,12 @@ class CheminementTest extends TestCase
             'id' => $cheminement->id,
             'option' => $requete['option'],
             'nom' => $requete['nom'],
-            'horaire_id' => $requete['horaire_id'],
         ]);
     }
     public function test_modification_cours_invalid(){
 
         $cours1 = Cours::factory()->createOne();
         $cours2 = Cours::factory()->createOne();
-        $contrainte1 = Contrainte::factory()->createOne();
-        $contrainte2 = Contrainte::factory()->createOne();
         $horaire = Horaire::factory()->createOne();
 
         $cheminement = Cheminement::factory()->createOne();
@@ -149,7 +141,6 @@ class CheminementTest extends TestCase
             'nom' => null,
             'horaire_id' => $horaire->id,
             'cours' => [$cours1->id,$cours2->id],
-            'contraintes' => [$contrainte1->id,$contrainte2->id]
         ];
 
         $response = $this->putJson('/api/cheminement/'. $cheminement->id,$requete);

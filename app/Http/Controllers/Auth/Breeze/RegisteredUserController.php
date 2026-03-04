@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth\Breeze;
 
 use App\Http\Controllers\Controller;
+use App\Models\Horaire;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
@@ -21,14 +22,17 @@ class RegisteredUserController extends Controller
     public function store(Request $request): Response
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'nom' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $user = User::create([
-            'name' => $request->name,
+            'nom' => $request->name,
+            'prenom'=>$request->prenom,
+            'role'=>$request->role,
             'email' => $request->email,
+            'horaire_id'=> Horaire::factory()->create()->id,
             'password' => Hash::make($request->password),
         ]);
 

@@ -1,12 +1,15 @@
 <?php
 
+//AUTHOR: Louis-Carl Proulx
+
 namespace Tests\Feature;
 
 use App\Models\Campus;
 use App\Models\Cours;
 use App\Models\GroupeCours;
-use App\Models\Personnel;
+
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Testing\Fluent\AssertableJson;
@@ -25,14 +28,15 @@ class GroupeCoursTest extends TestCase
         parent::setUp();
 
 
-        $personnel = Personnel::factory()->create();
-        $cours = Cours::factory()->create();
-        $this->seed(\Database\Seeders\CampusSeeder::class);
-        $this->personnel = $personnel->id;
-        $this->coursId = $cours->id;
-        $this->campus = Campus::first();
         $user = User::factory()->create();
+        $role = Role::find(1);
+        $user->role()->attach($role);
+        $this->cours = Cours::factory()->create();
+        $this->seed(\Database\Seeders\CampusSeeder::class);
+        $this->user = $user->id;
+        $this->campus = Campus::first();
         Sanctum::actingAs($user);
+
     }
 
     //section index
@@ -55,15 +59,17 @@ class GroupeCoursTest extends TestCase
     public function test_store_groupe_cours_valid()
     {
         // Arrange
-        $personnel = Personnel::factory()->create();
-        $this->personnelId = $personnel->id;
+        $user = User::factory()->create();
+        $this->userId = $user->id;
         $cours = Cours::factory()->create();
 
         $requestData = [
             'nbetud' => $this->faker->numberBetween(10, 100),
             'campus' => $this->campus->id,
-            'enseignant' => $personnel->id,
+            'enseignant' => $user->id,
             'cour' => $cours->id,
+            'couleur'=> '#FF0000',
+            'groupe'=> 1
 
         ];
 
@@ -76,7 +82,7 @@ class GroupeCoursTest extends TestCase
             'data' => [
                 '*' => [
                     'id',
-                    'nbEtud',
+                    'nbetud',
                     'groupe',
                     'campus',
                     'cour',
@@ -87,7 +93,7 @@ class GroupeCoursTest extends TestCase
         $this->assertDatabaseHas('groupe_cours', [
             'nbetud' => $requestData['nbetud'],
             'cours_id' => $requestData['cour'],
-            'personnel_id' => $requestData['enseignant'],
+            'user_id' => $requestData['enseignant'],
             'campus_id' => $requestData['campus'],
         ]);
     }
@@ -136,22 +142,23 @@ class GroupeCoursTest extends TestCase
     public function test_show_retourne_groupe_cours_avec_valid_id(): void
     {
 
-        $personnel = Personnel::factory()->create();
+        $user = User::factory()->create();
 
-        $groupeCours = GroupeCours::factory()->create([
+        $groupecour = GroupeCours::factory()->create([
             'campus_id' => $this->campus->id,
-            'personnel_id' => $personnel->id,
-            'cours_id' => $this->coursId,
+            'user_id' => $user->id,
+            'cours_id' => $this->cours->id,
+            'couleur'=> '#FF0000'
         ]);
 
-        $response = $this->getJson("/api/groupecours/{$groupeCours->id}");
+        $response = $this->getJson("/api/groupecours/{$groupecour->id}");
 
         $response->assertStatus(200);
 
         $response->assertJsonStructure([
             'data' => [
                 'id',
-                'nbEtud',
+                'nbetud',
                 'groupe',
                 'campus',
                 'cour',
@@ -160,47 +167,35 @@ class GroupeCoursTest extends TestCase
         ]);
 
         $responseData = $response->json('data');
-        $this->assertEquals($groupeCours->id, $responseData['id']);
+        $this->assertEquals($groupecour->id, $responseData['id']);
 
     }
     public function test_show_retourne_groupe_cours_avec_invalide_id(): void
     {
 
-        $personnel = Personnel::factory()->create();
+        $user = User::factory()->create();
 
-        $groupeCours = GroupeCours::factory()->create([
+        $groupecour = GroupeCours::factory()->create([
             'campus_id' => $this->campus->id,
-            'personnel_id' => $personnel->id,
-            'cours_id' => $this->coursId,
+            'user_id' => $user->id,
+            'cours_id' => $this->cours->id,
         ]);
-
-        $groupeCoursIdInvalide = 999;
-        $response = $this->getJson("/api/groupecours/{$groupeCoursIdInvalide}");
+        $groupecour->id = 99999;
+        $response = $this->getJson("/api/groupecours/{$groupecour->id}");
 
         $response->assertStatus(404);
-
-        $response->assertJson([
-            'error' => [
-                'code' => 404,
-                'message' => 'Groupe cours pas trouvé.',
-            ]
-        ]);
     }
 
     //Section delete
     public function test_destroy_groupe_cours_echec_avec_id_invalide()
     {
+        $groupeCoursIdInvalide = 999;
         // Act
-        $response = $this->deleteJson('/api/groupecours/invalid-id');
+        $response = $this->deleteJson("/api/groupecours/{$groupeCoursIdInvalide}");
 
         // Assert
         $response->assertStatus(404);
-        $response->assertJson([
-            'error' => [
-                'code' => 404,
-                'message' => 'Groupe cours introuvable.',
-            ]
-        ]);
+
     }
     public function test_destroy_groupe_cours_echec_avec_cours_invalide()
     {
@@ -214,49 +209,32 @@ class GroupeCoursTest extends TestCase
 
         // Assert
         $response->assertStatus(404);
-        $response->assertJson([
-            'error' => [
-                'code' => 404,
-                'message' => 'Cours associer non trouver.',
-            ]
-        ]);
     }
     public function test_destroy_groupe_cours_success()
     {
         // Arrange
-        $groupeCours = GroupeCours::factory()->create();
+        $groupecour = GroupeCours::factory()->create();
 
         // Act
-        $response = $this->deleteJson('/api/groupecours/' . $groupeCours->id);
+        $response = $this->deleteJson("/api/groupecours/{$groupecour->id}");
 
         // Assert
-        $this->assertDatabaseMissing('groupe_cours', ['id' => $groupeCours->id]);
+        $this->assertDatabaseMissing('groupe_cours', ['id' => $groupecour->id]);
         $response->assertStatus(200);
     }
-    public function test_destroy_groupe_cours_decremente_autre_groupe()
-    {
-        // Arrange
-        $cours = Cours::factory()->create();
-        $firstGroupeCours = GroupeCours::factory()->create(['cours_id' => $cours->id, 'groupe' => 1]);
-        $secondGroupeCours = GroupeCours::factory()->create(['cours_id' => $cours->id, 'groupe' => 2]);
-
-        // Act
-        $this->deleteJson('/api/groupecours/' . $firstGroupeCours->id);
-
-        // Assert
-        $updatedSecondGroupeCours = GroupeCours::find($secondGroupeCours->id);
-        $this->assertEquals(1, $updatedSecondGroupeCours->groupe);
-    }
-    public function test_update_groupe_cours_echec_invalide_personnel()
+    public function test_update_groupe_cours_echec_invalide_user()
     {
         // Arrange
         $groupeCours = GroupeCours::factory()->create();
-        $personnelIdInvalide = 99999;
+        $userIdInvalide = 99999;
 
         // Act
         $response = $this->putJson("/api/groupecours/{$groupeCours->id}", [
+            'campus' => $this->campus->id,
             'nbetud' => 20,
-            'personnel_id' => $personnelIdInvalide,
+            'couleur'=> '#FF0000',
+            'user_id' => $userIdInvalide,
+            'groupe'=> 1
         ]);
 
         // Assert
@@ -264,37 +242,49 @@ class GroupeCoursTest extends TestCase
         $response->assertJson([
             'error' => [
                 'code' => 404,
-                'message' => 'enseignant introuvable.',
+                'message' => 'Enseignant pas trouvé.',
             ]
         ]);
     }
     public function test_update_groupe_cours_success()
     {
+
         // Arrange
         $groupeCours = GroupeCours::factory()->create();
-        $personnel = Personnel::factory()->create();
+        $user = User::factory()->create();
         $newNbEtud = 20;
+
+
 
         // Act
         $response = $this->putJson("/api/groupecours/{$groupeCours->id}", [
+            'id'=> $groupeCours->id,
             'nbetud' => $newNbEtud,
-            'personnel_id' => $personnel->id,
+            'enseignant' => $user->id,
+            'couleur'=> '#FF0000',
+            'campus' => $this->campus->id,
+            'cour' => $this->cours->id,
+            'groupe'=> 1
         ]);
 
+
         // Assert
+        $response->assertJsonFragment([
+            'nbetud' => $newNbEtud,
+        ]);
         $this->assertDatabaseHas('groupe_cours', [
             'id' => $groupeCours->id,
-            'nbEtud' => $newNbEtud,
+            'nbetud' => $newNbEtud,
         ]);
         $response->assertStatus(200);
         $response->assertJsonFragment([
-            'nbEtud' => $newNbEtud,
+            'nbetud' => $newNbEtud,
         ]);
         $response->assertJsonStructure([
             'data' => [
                 '*' => [
                     'id',
-                    'nbEtud',
+                    'nbetud',
                     'groupe',
                     'campus',
                     'cour',

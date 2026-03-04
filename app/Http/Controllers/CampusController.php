@@ -11,6 +11,10 @@ use Illuminate\Http\Request;
 
 class CampusController extends BaseController
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Campus::class,'campus');
+    }
     /**
      * Display a listing of the resource.
      */
@@ -30,10 +34,9 @@ class CampusController extends BaseController
     /**
      * Display the specified resource.
      */
-    public function show(string $id):JsonResponse
+    public function show(Campus $campus):JsonResponse
     {
         // Trouvé le campus par le id
-        $campus = Campus::find($id);
 
         // Vérification qu'un campus à été trouvé.
         if (!$campus) {

@@ -19,7 +19,7 @@ class BlocCours extends Model
 
 
     protected $fillable = [
-        'jour',
+        'jour_id',
         'heures',
         'dure',
         'groupe_cours_id',
@@ -50,6 +50,9 @@ class BlocCours extends Model
 
         $this->local()->disassociate();
         $this->save();
+    }
+    public function jour(): BelongsTo{
+        return $this->belongsTo(Jour::class, 'jour_id');
     }
 
 }

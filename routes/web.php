@@ -13,8 +13,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return ['Laravel' => app()->version()];
+# Aucune route web côté serveur; rediriger vers client
+Route::fallback(function () {
+    return redirect(env('FRONTEND_URL'));
 });
 
-require __DIR__.'/auth.php';
+

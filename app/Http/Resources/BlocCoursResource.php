@@ -14,9 +14,11 @@ class BlocCoursResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $jour = new JourResource($this->jour);
+
         return [
         'id'=>$this->id,
-        'jour'=>$this->jour,
+        'jour'=>$jour->nom,
         'heures'=>$this->heures,
         'dure'=>$this->dure,
         'groupe_cours' => new GroupeCoursResource($this->groupecours),

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Horaire;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -18,11 +19,18 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
+            'prenom' => fake()->name(),
+            'nom' => fake()->name(),
+            'bureau' => fake()->randomElement(['1.860','1.840','1.810','1.360','1.160','1.640','2.630']),
+            'poste' => fake()->numberBetween(100,300),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
+            'premiere_utilisation' => true,
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
             'remember_token' => Str::random(10),
+            'horaire_id' => Horaire::factory()->create()->id,
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 

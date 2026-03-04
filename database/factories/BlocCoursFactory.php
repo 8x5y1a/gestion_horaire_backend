@@ -29,7 +29,7 @@ class BlocCoursFactory extends Factory
 
         }
         return [
-            'jour' => fake()->randomElement(['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi']),
+            'jour_id' => fake()->numberBetween(1, 5),
             'heures' => fake()->randomElement(['1110001110', '00001110011', '0111111100', '0000000111']),
             'dure' => fake()->numberBetween(1, 20),
             'groupe_cours_id' => $this->faker->randomElement($groupeCoursIds),

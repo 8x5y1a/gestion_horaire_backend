@@ -14,6 +14,13 @@ class BlocHeureResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        $jour = new JourResource($this->jour);
+
+        return [
+            'id'=>$this->id,
+            'heures' => $this->heures,
+            'jour'=>$jour->nom,
+            'contrainte'=>$this->contrainte
+        ];
     }
 }

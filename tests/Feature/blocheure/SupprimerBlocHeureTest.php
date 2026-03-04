@@ -1,8 +1,12 @@
 <?php
 
+//AUTHOR: Louis Peterlini
+
 namespace Tests\Feature\blocheure;
 
+use App\Models\BlocHeure;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Laravel\Sanctum\Sanctum;
@@ -16,16 +20,19 @@ class SupprimerBlocHeureTest extends TestCase
     {
         parent::setUp();
         $user = User::factory()->create([
-            'name'=>"userTest",
+            'nom'=>"userTest",
             'email'=>"adresse@exemple.com",
             'password' => 'password1'
         ]);
+        $role = Role::find(1);
+        $user->role()->attach($role);
         Sanctum::actingAs($user);
     }
 
     public function test_supprimer_bloc_heure(): void{
+        $blocheure = BlocHeure::factory()->create();
         //Effectuer la requête
-        $response = $this->deleteJson('/api/blocheure/1');
+        $response = $this->deleteJson("/api/blocheure/{$blocheure->id}");
         //Tester le résultat de la requête
         $response
             ->assertStatus(200)

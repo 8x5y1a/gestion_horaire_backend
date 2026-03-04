@@ -13,7 +13,7 @@ class GroupeCours extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nbEtud','groupe','cours_id','campus_id','personnel_id'];
+    protected $fillable = ['nbetud','groupe','cours_id','campus_id','user_id','couleur'];
 
     public function campus(): BelongsTo{
         return $this->belongsTo(Campus::class);
@@ -27,19 +27,37 @@ class GroupeCours extends Model
         return $this->hasMany(BlocCours::class);
     }
 
-    public function personnel(): BelongsTo{
-        return $this->belongsTo(Personnel::class);
+    public function user(): BelongsTo{
+        return $this->belongsTo(User::class);
     }
 
-    public function setEnseignant(Personnel $personnel):void{
-        $this->personnel()->associate($personnel);
+    public function setEnseignant(User $user):void{
+        $this->user()->associate($user);
         $this->save();
     }
     public function removeEnseignant():void{
-
-        $this->personnel()->disassociate();
+        $this->user()->disassociate();
         $this->save();
     }
+
+    public function setCours(Cours $cours):void{
+        $this->cours()->associate($cours);
+        $this->save();
+    }
+    public function removeCours():void{
+        $this->cours()->disassociate();
+        $this->save();
+    }
+    public function setCampus(Campus $campus):void{
+        $this->campus()->associate($campus);
+        $this->save();
+    }
+    public function removeCampus():void{
+        $this->campus()->dissociate();
+        $this->save();
+    }
+
+
 
 
 

@@ -6,6 +6,7 @@ use App\Http\Resources\CheminementResource;
 use App\Models\Cheminement;
 use App\Models\Contrainte;
 use App\Models\Cours;
+use App\Models\Horaire;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 /**
@@ -13,6 +14,10 @@ use Illuminate\Http\Request;
  */
 class CheminementController extends BaseController
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Cheminement::class);
+    }
     /**
      * Display a listing of the resource.
      */
@@ -30,17 +35,13 @@ class CheminementController extends BaseController
         $cheminement = Cheminement::create([
             'nom'=>$request->nom,
             'option'=>$request->option,
-            'horaire_id' => $request->horaire_id
+            'horaire_id' => Horaire::factory()->create()->id
         ]);
         $cheminement->cours()->detach();
-        $cheminement->contraintes()->detach();
+
         foreach ($request->cours as $cours ){
             $setCours = Cours::find($cours);
             $cheminement->cours()->attach($setCours);
-        }
-        foreach ($request->contraintes as $contraintes ){
-            $setContrainte = Contrainte::find($contraintes);
-            $cheminement->contraintes()->attach($setContrainte);
         }
         $cheminement->save();
         return $this->sendResponse(CheminementResource::collection(Cheminement::all()->sortBy('nom')));
@@ -54,19 +55,14 @@ class CheminementController extends BaseController
         $this->validationCheminement($request);
         $cheminement->update([
             'nom'=>$request->nom,
-            'option'=>$request->option,
-            'horaire_id' => $request->horaire_id
+            'option'=>$request->option
         ]);
         $cheminement->cours()->detach();
-        $cheminement->contraintes()->detach();
         foreach ($request->cours as $cours ){
             $setCours = Cours::find($cours);
             $cheminement->cours()->attach($setCours);
         }
-        foreach ($request->contraintes as $contraintes ){
-            $setContrainte = Contrainte::find($contraintes);
-            $cheminement->contraintes()->attach($setContrainte);
-        }
+
         $cheminement->save();
         return $this->sendResponse(CheminementResource::collection(Cheminement::all()->sortBy('nom')));
     }

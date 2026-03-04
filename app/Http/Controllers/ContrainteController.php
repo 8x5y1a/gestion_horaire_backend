@@ -3,21 +3,29 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ContrainteResource;
+use App\Http\Resources\TypeContrainteRessource;
+use App\Models\BlocGeneraux;
 use App\Models\BlocHeure;
 use App\Models\BlocLibre;
 use App\Models\Contrainte;
+use App\Models\Jour;
+use App\Models\TypeContrainte;
 use Illuminate\Http\Request;
 use PhpParser\Node\Expr\Cast\Bool_;
 
 class ContrainteController extends BaseController
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Contrainte::class);
+    }
     /**
      * @author Louis Peterlini
      * Méthode qui récupère la liste des contraintes.
      */
     public function index(): \Illuminate\Http\JsonResponse
     {
-        return $this->sendResponse(ContrainteResource::collection(Contrainte::all()->sortBy('type')));
+        return $this->sendResponse(ContrainteResource::collection(Contrainte::all()->sortBy('type_contrainte_id')));
     }
 
     /**
@@ -28,45 +36,50 @@ class ContrainteController extends BaseController
     {
         //Valider la contrainte
         $this->validateContrainte($request);
+        //Récupérer le type de contrainte
+        $typeContrainte = TypeContrainte::all()->firstWhere('nom', $request->type);
         //Créer la nouvelle contrainte à partir des données envoyées
         Contrainte::create([
             'nom' => $request->nom,
             'description' => $request->description,
-            'type'=> $request->type,
+            'type_contrainte_id'=> $typeContrainte->id,
+            'type_description'=> $request->precision,
             'stricte'=> $request->stricte,
             'session'=> $request->get('session')
         ]);
         //Ajouter les liaisons entres les Enseignants, Cours, BlocHeures et BlocLibres
         $this->gererLiaisons($request, Contrainte::all()->last());
         //Redirection
-        return $this->sendResponse(ContrainteResource::collection(Contrainte::all()->sortBy('type')), 201);
+        return $this->sendResponse(ContrainteResource::collection(Contrainte::all()->sortBy('type_contrainte_id')), 201);
     }
 
     /**
      * @author Louis Peterlini
      * Méthode qui récupère une contrainte en particulier.
      */
-    public function show(int $id): \Illuminate\Http\JsonResponse
+    public function show(Contrainte $contrainte): \Illuminate\Http\JsonResponse
     {
-        return $this->sendResponse(new ContrainteResource(Contrainte::findOrFail($id)));
+        return $this->sendResponse(new ContrainteResource(Contrainte::findOrFail($contrainte->id)));
     }
 
     /**
      * @author Louis Peterlini
      * Méthode qui met à jour une contrainte dans la base de données.
      */
-    public function update(Request $request, int $id): \Illuminate\Http\JsonResponse
+    public function update(Request $request, Contrainte $contrainte): \Illuminate\Http\JsonResponse
     {
         //Valider la contrainte
         $this->validateContrainte($request);
+        //Récupérer le type de contrainte
+        $typeContrainte = TypeContrainte::all()->firstWhere('nom', $request->type);
         //Récupérer la contrainte à modifier
-        $contrainte = Contrainte::find($id);
         if($contrainte) {
             //Modifier la contrainte envoyée en paramètre
             $contrainte->update([
                 'nom' => $request->nom,
                 'description' => $request->description,
-                'type' => $request->type,
+                'type_contrainte_id'=> $typeContrainte->id,
+                'type_description'=> $request->precision,
                 'stricte' => $request->stricte,
                 'session' => $request->get('session'),
             ]);
@@ -75,7 +88,7 @@ class ContrainteController extends BaseController
             //Sauvegarder le changement de données
             $contrainte->save();
             //Redirection
-            return $this->sendResponse(ContrainteResource::collection(Contrainte::all()->sortBy('type')));
+            return $this->sendResponse(ContrainteResource::collection(Contrainte::all()->sortBy('type_contrainte_id')));
         }
         return $this->sendResponse('', 404);
     }
@@ -84,12 +97,12 @@ class ContrainteController extends BaseController
      * @author Louis Peterlini
      * Méthode qui supprime une contrainte de la base de données.
      */
-    public function destroy(int $id): \Illuminate\Http\JsonResponse
+    public function destroy(Contrainte $contrainte): \Illuminate\Http\JsonResponse
     {
         //Supprimer la contrainte dont l'ID envoyé en paramètre correspond
-        Contrainte::destroy($id);
+        Contrainte::destroy($contrainte->id);
         //Redirection
-        return $this->sendResponse(ContrainteResource::collection(Contrainte::all()->sortBy('type')));
+        return $this->sendResponse(ContrainteResource::collection(Contrainte::all()->sortBy('type_contrainte_id')));
     }
 
     /**
@@ -102,10 +115,13 @@ class ContrainteController extends BaseController
 
         return $request->validate([
             'nom'=>'required|string|max:50',
-            'description'=>'required|string|max:500',
-            'type'=>'required|string|max:50',
+            'description'=>'max:250',
+            'type'=>'required|string|exists:type_contraintes,nom',
+            'type_description'=>'required_if:type_contrainte_id,8|max:50',
             'stricte'=>'required|boolean',
-            'session'=>'required_if:type,generaux|integer|min:0|max:6'
+            'session'=>'required_if:type_contrainte_id,3|integer|min:0|max:6',
+            'enseignants'=>'required_if:type_contrainte_id,1,2,5,7',
+            'cours'=>'required_if:type_contrainte_id,6'
         ]);
     }
 
@@ -128,11 +144,11 @@ class ContrainteController extends BaseController
         if($lsEnseignantsId) {
             if($isModifier) {
                 //Détacher tous les enseignants de la contrainte
-                $contrainte->personnels()->detach();
+                $contrainte->users()->detach();
             }
             foreach ($lsEnseignantsId as $id) {
                 //Lier l'enseignant à la contrainte
-                $contrainte->personnels()->attach($id);
+                $contrainte->users()->attach($id);
             }
 
         }
@@ -143,8 +159,11 @@ class ContrainteController extends BaseController
                 $contrainte->cours()->detach();
             }
             foreach ($lsCoursId as $id) {
-                //Lier le cours à la contrainte
-                $contrainte->cours()->attach($id);
+                //Ignorer les cours supplémentaires
+                if(array_search($id, $lsCoursId) < 2) {
+                    //Lier le cours à la contrainte
+                    $contrainte->cours()->attach($id);
+                }
             }
         }
         //Supprimer tous les blocs existant sur la contrainte si on modifie
@@ -169,23 +188,48 @@ class ContrainteController extends BaseController
         //Vérifier que la liste des blocs d'heures existe
         if($lsBlocsHeures) {
             foreach ($lsBlocsHeures as $bloc) {
-                //Créer le bloc d'heure
-                BlocHeure::create([
-                    'jour'=>$bloc['jour'],
-                    'heures'=>$bloc['heures'],
-                    'contrainte_id'=>$contrainte['id']
-                ]);
+                //Ignorer les blocs supplémentaires
+                if(array_search($bloc, $lsBlocsHeures) < 5 && $bloc['jour'] !== 'Quotidien' ||
+                    array_search($bloc, $lsBlocsHeures) < 3 && $bloc['jour'] === 'Quotidien') {
+                    //Récupérer le jour
+                    $jour = Jour::all()->firstWhere('nom', $bloc['jour']);
+                    //Créer le bloc d'heure
+                    BlocHeure::create([
+                        'jour_id' => $jour['id'],
+                        'heures' => $bloc['heures'],
+                        'contrainte_id' => $contrainte['id']
+                    ]);
+                }
             }
         }
         //Vérifier que la liste des blocs libres existe
         if($lsBlocsLibres) {
             foreach ($lsBlocsLibres as $bloc) {
-                //Créer le bloc libre
-                BlocLibre::create([
-                    'nb_bloc'=>$bloc['nb_bloc'],
-                    'nb_heure'=>$bloc['nb_heure'],
-                    'contrainte_id'=>$contrainte['id']
-                ]);
+                //Ignorer les blocs supplémentaires
+                if(array_search($bloc, $lsBlocsLibres) < 3) {
+                    //Créer le bloc libre
+                    BlocLibre::create([
+                        'nb_bloc' => $bloc['nb_bloc'],
+                        'nb_heure' => $bloc['nb_heure'],
+                        'contrainte_id' => $contrainte['id']
+                    ]);
+                    //Si la contrainte est un de type Généraux, Créer les bloc généraux
+                    if ($contrainte['type'] == 'generaux') {
+
+                        //Récupérer le id du bloc libre créer
+                        $idBlocLibre = BlocLibre::all()->last()->id;
+
+                        //Crée tous les bloc généraux pour le nombre de bloc désiré
+                        for ($index = 1; $index <= $bloc['nb_bloc']; $index++) {
+                            BlocGeneraux::create([
+                                'jour_id' => 9,
+                                'heures' => '0000000000',
+                                'dure' => $bloc['nb_heure'],
+                                'bloc_libre_id' => $idBlocLibre
+                            ]);
+                        }
+                    }
+                }
             }
         }
     }

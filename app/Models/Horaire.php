@@ -4,22 +4,24 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
 /* @author: Fabrice Fortin */
 class Horaire extends Model
 {
     use HasFactory;
     use HasFactory;
-    protected $fillable = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi'];
+    protected $fillable = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
 
-    public function local(){
+    public function local(): HasOne{
         return $this->hasOne(Local::class);
     }
 
-    public function personnel(){
-        return $this->hasOne(Personnel::class);
+    public function user(): HasOne{
+        return $this->hasOne(User::class);
     }
 
-    public function cheminement(){
+    public function cheminement(): HasOne{
         return $this->hasOne(Cheminement::class);
     }
 }

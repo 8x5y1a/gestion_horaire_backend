@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('horaires', function (Blueprint $table) {
             $table->id();
-            $table->string("lundi");
-            $table->string("mardi");
-            $table->string("mercredi");
-            $table->string("jeudi");
-            $table->string("vendredi");
+            $table->string("Lundi");
+            $table->string("Mardi");
+            $table->string("Mercredi");
+            $table->string("Jeudi");
+            $table->string("Vendredi");
             $table->timestamps();
         });
     }

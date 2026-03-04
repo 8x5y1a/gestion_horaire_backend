@@ -5,7 +5,7 @@ namespace Database\Factories;
 use App\Models\Campus;
 use App\Models\Cours;
 use App\Models\GroupeCours;
-use App\Models\Personnel;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,14 +22,14 @@ class GroupeCoursFactory extends Factory
     public function definition(): array
     {
         $campusIds = Campus::pluck('id')->toArray();
-        $enseignantIds = Personnel::pluck('id')->toArray();
+        $enseignantIds = User::pluck('id')->toArray();
         $coursIds = Cours::pluck('id')->toArray();
 
         if (empty($campusIds)) {
             throw new \Exception('Pas de campus valid. svp assurer vous que des campus soient disponible.');
         }
         if (empty($enseignantIds)) {
-            throw new \Exception('Pas de personnel valid. svp assurer vous que du personnel est disponible.');
+            throw new \Exception('Pas de user valid. svp assurer vous que du user est disponible.');
         }
         if (empty($coursIds)) {
             throw new \Exception('Pas de cours valid. svp assurer vous que des cours sont disponible.');
@@ -39,9 +39,10 @@ class GroupeCoursFactory extends Factory
 
 
         return [
-            'nbEtud' => fake()->numberBetween(3,200),
+            'nbetud' => fake()->numberBetween(3,200),
+            'couleur' => fake()->hexColor(),
             'campus_id' => $this->faker->randomElement($campusIds),
-            'personnel_id' => $this->faker->randomElement($enseignantIds),
+            'user_id' => $this->faker->randomElement($enseignantIds),
             'groupe' => $countForSelectedCours,
             'cours_id' => $coursId,
             'created_at' => now(),

@@ -4,13 +4,21 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\LocalResource;
+use App\Models\BlocCours;
+use App\Models\GroupeCours;
 use App\Models\Horaire;
+use App\Models\Jour;
 use App\Models\Local;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class LocalController extends BaseController
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Local::class);
+    }
     /**
      * Display a listing of the resource.
      */
@@ -64,8 +72,46 @@ class LocalController extends BaseController
      */
     public function destroy(Local $local): JsonResponse
     {
-        Local::destroy($local->id);
+        //Récupérer tous les blocs cours enregistrés dans le local
+        $listeBlocCours = BlocCours::all()->where('local_id', $local['id']);
+        foreach ($listeBlocCours as $bloc){
+
+            //Récupérer le jour du bloc cours
+            $jour = Jour::find($bloc['jour_id']);
+            //Récupérer l'horaire de l'utilisateur
+            $groupeCours = GroupeCours::find($bloc['groupe_cours_id']);
+
+            $user = User::find($groupeCours['user_id']);
+
+            $horaireUser = Horaire::find($user['horaire_id']);
+
+            //Calculer l'horaire de l'utilisateur sans le bloc cours
+            $heureModifiee = '0000000000';
+            for ($i = 0; $i < 10; $i++) {
+                if ($bloc['heures'][$i] != 1 && $horaireUser[$jour['nom']][$i] == 1) {
+                    $heureModifiee[$i] = 1;
+                }
+            }
+            //Mettre à jour l'horaire de l'utilisateur
+            $horaireUser->update([$jour['nom'] => $heureModifiee]);
+            //Mettre à jour le bloc cours
+            $bloc->update(['heures' => '0000000000', 'local_id' => null]);
+
+            $horaireUser->save();
+            $bloc->save();
+        }
+        //Vider l'horaire du local
+        $local->horaire()->update([
+            'Lundi' => '0000000000',
+            'Mardi' => '0000000000',
+            'Mercredi' => '0000000000',
+            'Jeudi' => '0000000000',
+            'Vendredi' => '0000000000'
+            ]);
         $local->save();
+        //Supprimer le local
+        $local->delete();
+
         return $this->sendResponse(LocalResource::collection(Local::all()->sortBy('no_local')));
     }
 
@@ -77,7 +123,7 @@ class LocalController extends BaseController
     private function validateLocal(Request $request): array
     {
         return $request->validate([
-            'no_local' => 'required',
+            'no_local' => 'required|max:50', //Aucun regex car il a été mentionné que le local pourrait être n'importe quoi
             'capacite' => 'required|int|min:1|max:1000',
             'local_technique' => 'required|boolean'
             ]);

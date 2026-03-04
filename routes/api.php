@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Auth\APIAuthController;
+use App\Http\Controllers\Auth\Breeze\NewPasswordController;
+use App\Http\Controllers\Auth\Breeze\PasswordResetLinkController;
 use App\Http\Controllers\Auth\Breeze\RegisteredUserController;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
@@ -20,12 +22,13 @@ use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => ['guest']], function(){
     Route::post('/login',[APIAuthController::class, 'login']);
     Route::post('/register', [RegisteredUserController::class, 'store']);
+    Route::post('/forgot-password', [PasswordResetLinkController::class, 'store']);
+    Route::post('/reset-password', [NewPasswordController::class, 'store']);
 });
 
-Route::group(['middleware' => ['auth:sanctum']], function (){
+Route::group(['middleware' => ['auth:sanctum', 'verified']], function (){
 
     Route::post('/logout',[APIAuthController::class, 'logout']);
-    Route::get('/user', function (Request $request) { return new UserResource($request->user());});
     Route::apiResource('/blocheure', \App\Http\Controllers\BlocHeureController::class);
     Route::apiResource('/bloclibre', \App\Http\Controllers\BlocLibreController::class);
     Route::apiResource('/contrainte', \App\Http\Controllers\ContrainteController::class);
@@ -33,10 +36,10 @@ Route::group(['middleware' => ['auth:sanctum']], function (){
     Route::apiResource('/bloccours',\App\Http\Controllers\BlocCoursController::class);
     Route::apiResource('/groupecours', \App\Http\Controllers\GroupeCoursController::class);
     Route::apiResource('/local', \App\Http\Controllers\LocalController::class);
-    Route::apiResource('/personnel', \App\Http\Controllers\PersonnelController::class);
+    Route::apiResource('/user', \App\Http\Controllers\UserController::class);
     Route::apiResource('/cheminement',\App\Http\Controllers\CheminementController::class);
     Route::apiResource('/horaire',\App\Http\Controllers\HoraireController::class);
     Route::apiResource('/campus',\App\Http\Controllers\CampusController::class);
-
+    Route::apiResource('/bloc_generaux',\App\Http\Controllers\BlocGenerauxController::class);
+    Route::apiResource('/role',\App\Http\Controllers\RoleController::class);
 });
-

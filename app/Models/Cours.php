@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 /**
  * @author Mathieu Lahaie-Richer
  */
@@ -15,12 +17,12 @@ class Cours extends Model
     protected $fillable =['code','nom','ponderation','bloc','local_technique','cours_charge','session'];
 
     //Relation table groupe_cours
-    public function groupecours(){
+    public function groupecours(): HasMany{
         return $this->hasMany(GroupeCours::class);
     }
 
     //Relation table cheminements
-    public function cheminement(){
+    public function cheminement(): BelongsToMany{
         return $this->belongsToMany(Cheminement::class);
     }
 

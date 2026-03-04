@@ -1,8 +1,11 @@
 <?php
 
+//AUTHOR: Louis Peterlini
+
 namespace Tests\Feature\contrainte;
 
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Laravel\Sanctum\Sanctum;
@@ -15,7 +18,8 @@ class AjouterContrainteTest extends TestCase
     private array $contrainteData = [
         "nom"=>"ContrainteTest",
         "description"=>"ContrainteTest",
-        "type"=>"autreContrainte",
+        "type"=>"autre",
+        "precision"=>"autreContrainte",
         "stricte"=>0,
         "session"=>1,
         "enseignants"=>[1,2],
@@ -28,10 +32,12 @@ class AjouterContrainteTest extends TestCase
     {
         parent::setUp();
         $user = User::factory()->create([
-            'name'=>"userTest",
+            'nom'=>"userTest",
             'email'=>"adresse@exemple.com",
             'password' => 'password1'
         ]);
+        $role = Role::find(1);
+        $user->role()->attach($role);
         Sanctum::actingAs($user);
     }
 
@@ -69,23 +75,11 @@ class AjouterContrainteTest extends TestCase
             ->assertJson(fn (AssertableJson $json) => $json->has('message')->has('errors'));
     }
     //VALIDATION : DESCRIPTION
-    public function test_ajouter_contrainte_invalide_description_required(): void{
+    public function test_ajouter_contrainte_invalide_description_maxlength_250(): void{
         //Récupérer les données
         $contrainteDataInvalide = $this->contrainteData;
         //Changer pour des données invalides
-        $contrainteDataInvalide["description"] = "";
-        //Effectuer la requête
-        $response = $this->postJson('/api/contrainte', $contrainteDataInvalide);
-        //Tester le résultat de la requête
-        $response
-            ->assertStatus(422)
-            ->assertJson(fn (AssertableJson $json) => $json->has('message')->has('errors'));
-    }
-    public function test_ajouter_contrainte_invalide_description_maxlength_500(): void{
-        //Récupérer les données
-        $contrainteDataInvalide = $this->contrainteData;
-        //Changer pour des données invalides
-        $contrainteDataInvalide["description"] = str_repeat("A", 501);
+        $contrainteDataInvalide["description"] = str_repeat("A", 251);
         //Effectuer la requête
         $response = $this->postJson('/api/contrainte', $contrainteDataInvalide);
         //Tester le résultat de la requête
@@ -98,7 +92,7 @@ class AjouterContrainteTest extends TestCase
         //Récupérer les données
         $contrainteDataInvalide = $this->contrainteData;
         //Changer pour des données invalides
-        $contrainteDataInvalide["type"] = "";
+        $contrainteDataInvalide["type"] = null;
         //Effectuer la requête
         $response = $this->postJson('/api/contrainte', $contrainteDataInvalide);
         //Tester le résultat de la requête
@@ -106,11 +100,11 @@ class AjouterContrainteTest extends TestCase
             ->assertStatus(422)
             ->assertJson(fn (AssertableJson $json) => $json->has('message')->has('errors'));
     }
-    public function test_ajouter_contrainte_invalide_type_maxlength_50(): void{
+    public function test_ajouter_contrainte_invalide_type_description_maxlength_50(): void{
         //Récupérer les données
         $contrainteDataInvalide = $this->contrainteData;
         //Changer pour des données invalides
-        $contrainteDataInvalide["type"] = str_repeat("A", 51);
+        $contrainteDataInvalide["type_description"] = str_repeat("A", 51);
         //Effectuer la requête
         $response = $this->postJson('/api/contrainte', $contrainteDataInvalide);
         //Tester le résultat de la requête

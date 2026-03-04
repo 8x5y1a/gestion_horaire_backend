@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('bloc_heures', function (Blueprint $table) {
             $table->id();
-            $table->string('jour');
             $table->string('heures');
             $table->unsignedBigInteger('contrainte_id');
+            $table->unsignedBigInteger('jour_id');
             $table->timestamps();
-
+            $table->foreign('jour_id')->references('id')->on('jours')->onDelete('cascade');
             $table->foreign('contrainte_id')->references('id')->on('contraintes')->onDelete('cascade');
         });
     }

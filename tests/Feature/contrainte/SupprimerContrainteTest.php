@@ -1,8 +1,11 @@
 <?php
 
+//AUTHOR: Louis Peterlini
+
 namespace Tests\Feature\contrainte;
 
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Laravel\Sanctum\Sanctum;
@@ -16,10 +19,12 @@ class SupprimerContrainteTest extends TestCase
     {
         parent::setUp();
         $user = User::factory()->create([
-            'name'=>"userTest",
+            'nom'=>"userTest",
             'email'=>"adresse@exemple.com",
             'password' => 'password1'
         ]);
+        $role = Role::find(1);
+        $user->role()->attach($role);
         Sanctum::actingAs($user);
     }
 

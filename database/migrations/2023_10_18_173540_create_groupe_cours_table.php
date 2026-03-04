@@ -13,16 +13,17 @@ return new class extends Migration
     {
         Schema::create('groupe_cours', function (Blueprint $table) {
             $table->id();
-            $table->integer('nbEtud');
+            $table->integer('nbetud');
             $table->integer('groupe');
             $table->unsignedBigInteger('campus_id')->nullable();
             $table->unsignedBigInteger('cours_id')->nullable();
-            $table->unsignedBigInteger('personnel_id')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->string('couleur');
             $table->timestamps();
 
-            $table->foreign('campus_id')->references('id')->on('campus')->nullOnDelete();
-            $table->foreign('cours_id')->references('id')->on('cours')->nullOnDelete();
-            $table->foreign('personnel_id')->references('id')->on('personnels')->nullOnDelete();
+            $table->foreign('campus_id')->references('id')->on('campus')->onDelete('cascade');
+            $table->foreign('cours_id')->references('id')->on('cours')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
         });
     }

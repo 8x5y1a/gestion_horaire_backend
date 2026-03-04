@@ -19,7 +19,7 @@ class Session extends Model
 
     /**
      * @return BelongsToMany
-     * annee: l'anner
+     * annee: l'année
      *
      */
 

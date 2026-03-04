@@ -1,8 +1,12 @@
 <?php
 
+//AUTHOR: Louis Peterlini
+
 namespace Tests\Feature\bloclibre;
 
+use App\Models\BlocLibre;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Laravel\Sanctum\Sanctum;
@@ -16,10 +20,12 @@ class BlocLibreTest extends TestCase
     {
         parent::setUp();
         $user = User::factory()->create([
-            'name'=>"userTest",
+            'nom'=>"userTest",
             'email'=>"adresse@exemple.com",
             'password' => 'password1'
         ]);
+        $role = Role::find(1);
+        $user->role()->attach($role);
         Sanctum::actingAs($user);
     }
 
@@ -32,8 +38,9 @@ class BlocLibreTest extends TestCase
             ->assertJson(fn (AssertableJson $json) => $json->has('data'));
     }
     public function test_recuperer_un_bloc_libre(): void{
+        $bloclibre = BlocLibre::factory()->create();
         //Effectuer la requête
-        $response = $this->getJson('/api/bloclibre/1');
+        $response = $this->getJson("/api/bloclibre/{$bloclibre->id}");
         //Tester le résultat de la requête
         $response
             ->assertStatus(200)

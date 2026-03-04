@@ -1,8 +1,12 @@
 <?php
 
+//AUTHOR: Louis Peterlini
+
 namespace Tests\Feature\bloclibre;
 
+use App\Models\BlocLibre;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Laravel\Sanctum\Sanctum;
@@ -16,16 +20,19 @@ class SupprimerBlocLibreTest extends TestCase
     {
         parent::setUp();
         $user = User::factory()->create([
-            'name'=>"userTest",
+            'nom'=>"userTest",
             'email'=>"adresse@exemple.com",
             'password' => 'password1'
         ]);
+        $role = Role::find(1);
+        $user->role()->attach($role);
         Sanctum::actingAs($user);
     }
 
     public function test_supprimer_bloc_libre(): void{
+        $bloclibre = BlocLibre::factory()->create();
         //Effectuer la requête
-        $response = $this->deleteJson('/api/bloclibre/1');
+        $response = $this->deleteJson("/api/bloclibre/{$bloclibre->id}");
         //Tester le résultat de la requête
         $response
             ->assertStatus(200)

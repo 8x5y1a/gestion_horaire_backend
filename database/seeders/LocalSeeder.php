@@ -15,11 +15,11 @@ class LocalSeeder extends Seeder
     public function run(): void
     {
         DB::table('locaux')->insert([
-            ['id'=>1,'no_local' => '1.085', 'capacite'=>20, 'local_technique'=>false, 'horaire_id'=>Horaire::factory()->createOne()->id, 'created_at'=> now(),'updated_at'=>now()],
-            ['id'=>2,'no_local' => '1.105A', 'capacite'=>20, 'local_technique'=>false, 'horaire_id'=>Horaire::factory()->createOne()->id, 'created_at'=> now(),'updated_at'=>now()],
-            ['id'=>3,'no_local' => '1.079', 'capacite'=>20, 'local_technique'=>true, 'horaire_id'=>Horaire::factory()->createOne()->id, 'created_at'=> now(),'updated_at'=>now()],
-            ['id'=>4,'no_local' => '1.063', 'capacite'=>20, 'local_technique'=>false, 'horaire_id'=>Horaire::factory()->createOne()->id, 'created_at'=> now(),'updated_at'=>now()],
-            ['id'=>5,'no_local' => '2.108', 'capacite'=>20, 'local_technique'=>false, 'horaire_id'=>Horaire::factory()->createOne()->id, 'created_at'=> now(),'updated_at'=>now()],
+            ['id'=>1,'no_local' => '1.085', 'capacite'=>25, 'local_technique'=>false, 'horaire_id'=>Horaire::factory()->createOne()->id, 'created_at'=> now(),'updated_at'=>now()],
+            ['id'=>2,'no_local' => '1.105A', 'capacite'=>26, 'local_technique'=>false, 'horaire_id'=>Horaire::factory()->createOne()->id, 'created_at'=> now(),'updated_at'=>now()],
+            ['id'=>3,'no_local' => '1.073', 'capacite'=>25, 'local_technique'=>true, 'horaire_id'=>Horaire::factory()->createOne()->id, 'created_at'=> now(),'updated_at'=>now()],
+            ['id'=>4,'no_local' => '1.063', 'capacite'=>25, 'local_technique'=>false, 'horaire_id'=>Horaire::factory()->createOne()->id, 'created_at'=> now(),'updated_at'=>now()],
+            ['id'=>5,'no_local' => '2.708', 'capacite'=>25, 'local_technique'=>false, 'horaire_id'=>Horaire::factory()->createOne()->id, 'created_at'=> now(),'updated_at'=>now()],
             ]);
     }
 }

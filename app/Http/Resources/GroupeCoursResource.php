@@ -16,11 +16,12 @@ class GroupeCoursResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'nbEtud' => $this->nbEtud,
+            'nbetud' => $this->nbetud,
             'groupe' => $this->groupe,
             'campus' => $this->campus,
-            'cour' => $this->cours,
-            'enseignant' => new PersonnelResource($this->personnel),
+            'cour' => new CoursResource($this->cours),
+            'couleur' => $this->couleur,
+            'enseignant' => new UserResource($this->user),
         ];
     }
 }

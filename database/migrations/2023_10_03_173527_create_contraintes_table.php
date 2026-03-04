@@ -14,12 +14,15 @@ return new class extends Migration
         Schema::create('contraintes', function (Blueprint $table) {
             $table->id();
             $table->string('nom');
-            $table->string('description');
-            $table->string('type');
+            $table->string('description')->nullable();
+            $table->unsignedBigInteger('type_contrainte_id');
+            $table->string('type_description')->default('')->nullable();
             $table->boolean('stricte');
             $table->integer('session')->nullable();
             $table->timestamps();
-       });
+
+            $table->foreign('type_contrainte_id')->references('id')->on('type_contraintes')->onDelete('cascade');
+        });
     }
 
     /**

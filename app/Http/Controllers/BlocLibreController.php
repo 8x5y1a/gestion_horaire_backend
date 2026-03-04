@@ -3,12 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\BlocLibreResource;
+use App\Models\BlocGeneraux;
 use App\Models\BlocLibre;
 use App\Models\Contrainte;
 use Illuminate\Http\Request;
 
 class BlocLibreController extends BaseController
 {
+    public function __construct()
+    {
+        $this->authorizeResource(BlocLibre::class,'bloclibre');
+    }
     /**
      * @author Louis Peterlini
      * Méthode qui récupère la liste des blocs libres.
@@ -32,6 +37,9 @@ class BlocLibreController extends BaseController
             'nb_heure' => $request->nb_heure,
             'contrainte_id'=> $request->contrainte_id
         ]);
+
+        $this->gererLiaisons($request, BlocLibre::all()->last(), false);
+
         //Redirection
         return $this->sendResponse(BlocLibreResource::collection(BlocLibre::all()), 201);
 
@@ -41,30 +49,32 @@ class BlocLibreController extends BaseController
      * @author Louis Peterlini
      * Méthode qui récupère un bloc libre en particulier.
      */
-    public function show(int $id): \Illuminate\Http\JsonResponse
+    public function show(BlocLibre $bloclibre): \Illuminate\Http\JsonResponse
     {
-        return $this->sendResponse(BlocLibre::find($id));
+        return $this->sendResponse(BlocLibre::find($bloclibre->id));
     }
 
     /**
      * @author Louis Peterlini
      * Méthode qui met à jour un bloc libre dans la base de données.
      */
-    public function update(Request $request, int $id): \Illuminate\Http\JsonResponse
+    public function update(Request $request, BlocLibre $bloclibre): \Illuminate\Http\JsonResponse
     {
         //Valider le bloc libre
         $this->validateBlocLibre($request);
         //Récupérer le bloc libre à modifier
-        $blocLibre = BlocLibre::find($id);
-        if($blocLibre) {
+        if($bloclibre) {
             //Modifier le bloc libre envoyé en paramètre
-            $blocLibre->update([
+            $bloclibre->update([
                 'nb_bloc' => $request->nb_bloc,
                 'nb_heure' => $request->nb_heure,
                 'contrainte_id' => $request->contrainte_id
             ]);
             //Sauvergader le changement de données
-            $blocLibre->save();
+            $bloclibre->save();
+
+            $this->gererLiaisons($request, $bloclibre, true);
+
             //Redirection
             return $this->sendResponse(BlocLibreResource::collection(BlocLibre::all()));
         }
@@ -75,10 +85,10 @@ class BlocLibreController extends BaseController
      * @author Louis Peterlini
      * Méthode qui supprime un bloc libre de la base de données.
      */
-    public function destroy(int $id): \Illuminate\Http\JsonResponse
+    public function destroy(BlocLibre $bloclibre): \Illuminate\Http\JsonResponse
     {
         //Supprimer le bloc libre dont l'ID envoyé en paramètre correspond
-        BlocLibre::destroy($id);
+        BlocLibre::destroy($bloclibre->id);
         //Redirection
         return $this->sendResponse(BlocLibreResource::collection(BlocLibre::all()));
     }
@@ -91,8 +101,38 @@ class BlocLibreController extends BaseController
     private function validateBlocLibre(Request $request): array{
 
         return $request->validate([
-            'nb_bloc'=>'required|integer|min:1',
-            'nb_heure'=>'required|integer|min:1'
+            'nb_bloc'=>'required|integer|min:1|max:5',
+            'nb_heure'=>'required|integer|min:1|max:5',
+            'contrainte.id'=>'exists:contraintes,id',
         ]);
+    }
+
+    /**
+     * @Author: Méthode faite par Louis Peterlini dans ContrainteController, adapté par JeanFrancois Gamache dans BlocLibre
+     * Méthode qui gère les liaisons d'objets de BlocLibre en ajoutant ou modifiant celles-ci
+     * selon le cas.
+     * @param Request $request La requête contenant les données à ajouter ou modifier.
+     * @param BlocLibre $blocLibre Le blocLibre sur laquelle les liaisons s'appliqueront.
+     * @param bool $isModifier Booléen pour déterminer si on veut ajouter ou modifier les liaisons.
+     */
+    private function gererLiaisons(Request $request, BlocLibre $blocLibre, bool $isModifier): void{
+
+        //Si on modifie le blocLibre: Supprimer tous les blocGénéraux associés
+        if($isModifier){
+            $lsBlocGeneraux = BlocGeneraux::all()->where('bloc_libre_id', $blocLibre['id']);
+            foreach ($lsBlocGeneraux as $blocGeneraux){
+                BlocGeneraux::destroy($blocGeneraux);
+            }
+        }
+
+        //Créer tous les blocs généraux pour le nombre de blocs désirés
+        for ($index = 0; $request->nb_bloc > $index; $index++ ){
+            BlocGeneraux::create([
+                'jour_id' => 9,
+                'heures' => '0000000000',
+                'dure' => $request->dure,
+                'bloc_libre_id' => $blocLibre['id']
+            ]);
+        }
     }
 }

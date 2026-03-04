@@ -1,10 +1,13 @@
 <?php
 
+//AUTHOR: Mathieu Lahaie-Richer
 
 use App\Models\Cheminement;
 use App\Models\Cours;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -22,8 +25,12 @@ class CoursTest extends TestCase
     public function setUp():void{
 
         parent::setUp();
+
         $user = User::factory()->create();
+        $role = Role::find(1);
+        $user->role()->attach($role);
         Sanctum::actingAs($user);
+
     }
     public function test_liste_cours(){
 
@@ -114,20 +121,20 @@ class CoursTest extends TestCase
         $response->assertJsonValidationErrors('ponderation');
     }
 
-    public function test_suppression_cours_valid(){
+    public function test_suppression_cours_valid() : void{
 
         $cheminement = Cheminement::factory()->createOne();
-        $cour = Cours::factory()->createOne();
-        $cour->cheminement()->attach($cheminement);
+        $cours = Cours::factory()->createOne();
+        $cours->cheminement()->attach($cheminement);
 
-        $response = $this->deleteJson('/api/cours/' . $cour->id);
+        $response = $this->deleteJson("/api/cours/{$cours->id}");
 
         $response->assertStatus(200);
 
-        $this->assertDatabaseMissing('cours',['id' => $cour->id]);
+        $this->assertDatabaseMissing('cours',['id' => $cours->id]);
     }
 
-    public function test_modification_cours_valid(){
+    public function test_modification_cours_valid():void{
 
         $cheminement1 = Cheminement::factory()->createOne();
         $cheminement2 = Cheminement::factory()->createOne();
@@ -146,7 +153,7 @@ class CoursTest extends TestCase
         ];
 
         //Requête pour modifier le cours.
-        $response = $this->putJson('/api/cours/'. $cours->id,$requete);
+        $response = $this->Json('PUT',"/api/cours/{$cours->id}",$requete);
 
         $response->assertStatus(200);
 
@@ -162,7 +169,7 @@ class CoursTest extends TestCase
         ]);
     }
 
-    public function test_modification_cours_invalid(){
+    public function test_modification_cours_invalid():void{
 
         $cheminement1 = Cheminement::factory()->createOne();
         $cheminement2 = Cheminement::factory()->createOne();
@@ -182,7 +189,7 @@ class CoursTest extends TestCase
         ];
 
         //Requête pour modifier le cours.
-        $response = $this->putJson('/api/cours/'. $cours->id,$requete);
+        $response = $this->json('PUT','/api/cours/'. $cours->id,$requete);
 
         $response->assertStatus(422);
 

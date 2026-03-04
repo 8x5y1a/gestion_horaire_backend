@@ -14,6 +14,11 @@ class BlocLibreResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return[
+            'id'=>$this->id,
+            'nb_bloc'=>$this->nb_bloc,
+            'nb_heure'=>$this->nb_heure,
+            'contrainte'=>$this->contrainte
+        ];
     }
 }

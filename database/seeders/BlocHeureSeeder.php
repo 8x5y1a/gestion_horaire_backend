@@ -8,26 +8,49 @@ use Illuminate\Support\Facades\DB;
 
 class BlocHeureSeeder extends Seeder
 {
-    /**
+    /**@author Fabrice Fortin
      * Run the database seeds.
      */
     public function run(): void
     {
         DB::table('bloc_heures')->insert([
-            ['id'=>1,'jour'=>'Lundi', 'heures'=>'1100000000', 'contrainte_id'=>4, 'created_at'=> now(),'updated_at'=>now()],
-            ['id'=>2,'jour'=>'Mardi', 'heures'=>'1100000000', 'contrainte_id'=>4, 'created_at'=> now(),'updated_at'=>now()],
-            ['id'=>3,'jour'=>'Mercredi', 'heures'=>'1100000000', 'contrainte_id'=>4, 'created_at'=> now(),'updated_at'=>now()],
-            ['id'=>4,'jour'=>'Jeudi', 'heures'=>'1100000000', 'contrainte_id'=>4, 'created_at'=> now(),'updated_at'=>now()],
-            ['id'=>5,'jour'=>'Vendredi', 'heures'=>'1100000000', 'contrainte_id'=>4, 'created_at'=> now(),'updated_at'=>now()],
-            ['id'=>6,'jour'=>'Lundi', 'heures'=>'1100000000', 'contrainte_id'=>5, 'created_at'=> now(),'updated_at'=>now()],
-            ['id'=>7,'jour'=>'Mardi', 'heures'=>'1100000000', 'contrainte_id'=>5, 'created_at'=> now(),'updated_at'=>now()],
-            ['id'=>8,'jour'=>'Mercredi', 'heures'=>'1100000000', 'contrainte_id'=>5, 'created_at'=> now(),'updated_at'=>now()],
-            ['id'=>9,'jour'=>'Jeudi', 'heures'=>'1100000000', 'contrainte_id'=>5, 'created_at'=> now(),'updated_at'=>now()],
-            ['id'=>10,'jour'=>'Vendredi', 'heures'=>'1100000000', 'contrainte_id'=>5, 'created_at'=> now(),'updated_at'=>now()],
-            ['id'=>11,'jour'=>'Mardi', 'heures'=>'0000000011', 'contrainte_id'=>6, 'created_at'=> now(),'updated_at'=>now()],
-            ['id'=>12,'jour'=>'Jeudi', 'heures'=>'0000000011', 'contrainte_id'=>6, 'created_at'=> now(),'updated_at'=>now()],
-            ['id'=>13,'jour'=>'Mercredi', 'heures'=>'0001110000', 'contrainte_id'=>7, 'created_at'=> now(),'updated_at'=>now()],
-            ['id'=>14,'jour'=>'Lundi', 'heures'=>'0000011100', 'contrainte_id'=>8, 'created_at'=> now(),'updated_at'=>now()],
-        ]);
+            //Valérie
+            ['id'=>1,'jour_id'=>3, 'heures'=>'0001110000', 'contrainte_id'=>6, 'created_at'=> now(),'updated_at'=>now()],
+            ['id'=>2,'jour_id'=>2, 'heures'=>'0110000000', 'contrainte_id'=>17, 'created_at'=> now(),'updated_at'=>now()],
+            ['id'=>3,'jour_id'=>2, 'heures'=>'0000000011', 'contrainte_id'=>18, 'created_at'=> now(),'updated_at'=>now()],
+            ['id'=>4,'jour_id'=>3, 'heures'=>'0000011110', 'contrainte_id'=>19, 'created_at'=> now(),'updated_at'=>now()],
+            ['id'=>5,'jour_id'=>4, 'heures'=>'0000000011', 'contrainte_id'=>16, 'created_at'=> now(),'updated_at'=>now()],
+
+            //Hasna
+            ['id'=>36,'jour_id'=>2, 'heures'=>'0000000011', 'contrainte_id'=>20, 'created_at'=> now(),'updated_at'=>now()],
+
+            //Pierre
+            ['id'=>37,'jour_id'=>4, 'heures'=>'0000001100', 'contrainte_id'=>21, 'created_at'=> now(),'updated_at'=>now()],
+
+            //Guillaume
+            ['id'=>38,'jour_id'=>2, 'heures'=>'0110000000', 'contrainte_id'=>23, 'created_at'=> now(),'updated_at'=>now()],
+            ['id'=>39,'jour_id'=>4, 'heures'=>'0000011110', 'contrainte_id'=>24, 'created_at'=> now(),'updated_at'=>now()],
+
+            //Dalicia
+            ['id'=>40,'jour_id'=>4, 'heures'=>'0000000011', 'contrainte_id'=>25, 'created_at'=> now(),'updated_at'=>now()],
+
+            //Rahpael
+            ['id'=>41,'jour_id'=>3, 'heures'=>'0000001111', 'contrainte_id'=>22, 'created_at'=> now(),'updated_at'=>now()],
+            ['id'=>42,'jour_id'=>4, 'heures'=>'0000011000', 'contrainte_id'=>22, 'created_at'=> now(),'updated_at'=>now()],
+            ['id'=>43,'jour_id'=>5, 'heures'=>'0000010000', 'contrainte_id'=>22, 'created_at'=> now(),'updated_at'=>now()],
+            ['id'=>44,'jour_id'=>5, 'heures'=>'1111100000', 'contrainte_id'=>15, 'created_at'=> now(),'updated_at'=>now()],
+
+            //Conciliation Travail-Famille
+            ['id'=>6,'jour_id'=>8, 'heures'=>'0000000001', 'contrainte_id'=>9, 'created_at'=> now(),'updated_at'=>now()],
+            ['id'=>11,'jour_id'=>8, 'heures'=>'0000000001', 'contrainte_id'=>10, 'created_at'=> now(),'updated_at'=>now()],
+            ['id'=>16,'jour_id'=>8, 'heures'=>'0000000001', 'contrainte_id'=>11, 'created_at'=> now(),'updated_at'=>now()],
+            ['id'=>21,'jour_id'=>8, 'heures'=>'0000000001', 'contrainte_id'=>12, 'created_at'=> now(),'updated_at'=>now()],
+            ['id'=>26,'jour_id'=>8, 'heures'=>'0000000001', 'contrainte_id'=>13, 'created_at'=> now(),'updated_at'=>now()],
+            ['id'=>31,'jour_id'=>8, 'heures'=>'0000000001', 'contrainte_id'=>14, 'created_at'=> now(),'updated_at'=>now()],
+
+
+            //Autre
+            ['id'=>45,'jour_id'=>8, 'heures'=>'1000000000', 'contrainte_id'=>4, 'created_at'=> now(),'updated_at'=>now()],
+            ]);
     }
 }

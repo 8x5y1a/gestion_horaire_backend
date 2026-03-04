@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Local extends Model
 {
@@ -22,7 +23,7 @@ class Local extends Model
     public function horaire(): BelongsTo{
         return $this->belongsTo(Horaire::class, 'horaire_id');
     }
-    public function bloc_cours() {
+    public function bloc_cours(): HasMany {
         return $this->hasMany(BlocCours::class, 'bloc_cours_id');
     }
 }

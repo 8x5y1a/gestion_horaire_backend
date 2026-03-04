@@ -19,7 +19,8 @@ class ContrainteFactory extends Factory
         return [
             'nom' => fake()->randomElement(['Contrainte importante', 'Contrainte très importante', 'Contrainte moins importante']),
             'description' => fake()->randomElement(['Il s\'agît d\'une contrainte.', 'Ceci est une contrainte.', 'Cela représente une contrainte.']),
-            'type' => fake()->randomElement(['conciliation', 'reunion', 'generaux', 'universelle', 'preference', 'lies', 'disponibilite']),
+            'type_contrainte_id' => fake()->randomElement([1, 2, 3, 4, 5, 6, 7, 8]),
+            'type_description' => fake()->randomElement(['Type 1', 'Type 2', 'Type3']),
             'stricte' => fake()->randomElement([0, 1]),
             'session'=> fake()->randomElement([1, 2, 3, 4, 5]),
             'created_at' => now(),
